@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 # 2. Config
 TOKEN = "8672169345:AAGAE5R-pbFQteCUkjKM-3DkP5rgp3_fPc4"
-POLL_LINK = "https://t.me/c/2800090700/1/19189"
+POLL_LINK = "https://t.me/c/2800090700/1/19199"
 
 # 3. Flask Web Server (To keep Render happy)
 app = Flask('')
@@ -57,7 +57,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     if query.data == "already_voted":
-        await query.message.reply_text(f"🌟 *Great job , {query.from_user.first_name}!*,Thanks for voting", parse_mode='Markdown')
+        await query.message.reply_text(f"🌟 *Great job , {query.from_user.first_name}!*, Thanks for voting", parse_mode='Markdown')
 
 # 5. Main Execution
 if __name__ == '__main__':
