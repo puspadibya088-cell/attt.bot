@@ -6,36 +6,33 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from telegram.constants import ChatMemberStatus
 
-# ===== Logging =====
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+# 1. Logging (Crucial for debugging)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# ===== Config =====
-TOKEN = os.environ.get("BOT_TOKEN")
-POLL_LINK = "https://t.me/c/2800090700/290/18953"
+# 2. Config
+TOKEN = "8672169345:AAGAE5R-pbFQteCUkjKM-3DkP5rgp3_fPc4"
+POLL_LINK = "https://t.me/c/2800090700/1/19189"
 
-if not TOKEN:
-    raise Exception("BOT_TOKEN not found in environment variables!")
-
-# ===== Flask Web Server =====
-app = Flask(__name__)
+# 3. Flask Web Server (To keep Render happy)
+app = Flask('')
 
 @app.route('/')
 def home():
     return "Bot is alive! 🚀"
 
 def run_flask():
+    # Render provides the PORT environment variable
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
 
-# ===== Telegram Bot Handlers =====
+# 4. Bot Handlers
 async def attendance_reminder_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Check if used in a group
     if update.effective_chat.type not in ["group", "supergroup"]:
         await update.message.reply_text("❌ This command only works in groups.")
         return
 
+    # Admin Check
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     member = await context.bot.get_chat_member(chat_id, user_id)
@@ -48,7 +45,7 @@ async def attendance_reminder_cmd(update: Update, context: ContextTypes.DEFAULT_
         InlineKeyboardButton("✅ Vote Now", url=POLL_LINK),
         InlineKeyboardButton("👍 Already Voted", callback_data="already_voted")
     ]]
-
+    
     await update.message.reply_text(
         "🔔 *ATTENDANCE REMINDER*\n\nPlease mark your attendance for today!",
         reply_markup=InlineKeyboardMarkup(keyboard),
@@ -58,20 +55,24 @@ async def attendance_reminder_cmd(update: Update, context: ContextTypes.DEFAULT_
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+
     if query.data == "already_voted":
-        await query.message.reply_text(f"🌟 *Great job, {query.from_user.first_name}!*", parse_mode='Markdown')
+        await query.message.reply_text(f"🌟 *Great job , {query.from_user.first_name}!*,Thanks for voting", parse_mode='Markdown')
 
-# ===== Main =====
+# 5. Main Execution
 if __name__ == '__main__':
-    # Start Flask in a background thread
-    Thread(target=run_flask, daemon=True).start()
+    if not TOKEN:
+        print("Error: BOT_TOKEN not found in environment variables!")
+        exit(1)
 
-    # Build the Telegram bot
+    # Start Flask in a background thread
+    Thread(target=run_flask).start()
+
+    # Start Telegram Bot
     application = ApplicationBuilder().token(TOKEN).build()
     
     application.add_handler(CommandHandler('reminder', attendance_reminder_cmd))
     application.add_handler(CallbackQueryHandler(button_callback))
     
-    print("Bot is running... 🚀")
-    # Use run_polling() with a long polling timeout
-    application.run_polling(timeout=60, polling_interval=2)
+    print("Bot is polling...")
+    application.run_polling()
