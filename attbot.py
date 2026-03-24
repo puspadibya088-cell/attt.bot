@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 # 2. Config
 TOKEN = "8672169345:AAGAE5R-pbFQteCUkjKM-3DkP5rgp3_fPc4"
-POLL_LINK = "https://t.me/c/2800090700/1/19199"
+POLL_LINK = "https://t.me/c/2800090700/290/19289"
 
 # 3. Flask Web Server (To keep Render happy)
 app = Flask('')
